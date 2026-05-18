@@ -1,0 +1,69 @@
+{
+  "projectType": "infrastructure",
+  "projectName": "Qualcomm Linux Build Guide",
+  "projectDescription": "Step-by-step guide to configure, download, compile, and flash Qualcomm Linux and associated firmware on supported Qualcomm development kits.",
+  "theme": "aspen",
+  "primaryColor": "#04347c",
+  "lightColor": "#4393ca",
+  "darkColor": "#2b5773",
+  "navigation": {
+    "groups": [
+      {
+        "group": "Overview",
+        "pages": [
+          "build-guide",
+          "build-overview"
+        ]
+      },
+      {
+        "group": "Build",
+        "pages": [
+          "build-from-source",
+          "build-from-source-with-firmware-and-devtool",
+          "build-with-qsc-cli"
+        ]
+      },
+      {
+        "group": "Flash",
+        "pages": [
+          "flash-software-images"
+        ]
+      },
+      {
+        "group": "Reference",
+        "pages": [
+          "how-to",
+          "troubleshoot"
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "Build Qualcomm Linux from source using prebuilt proprietary binaries (public access)",
+    "Build with firmware sources for registered/authorized Qualcomm users",
+    "QSC CLI for automated download, compile, and flash workflow",
+    "Yocto-based BSP image builds with kas tooling",
+    "Flash software images to devices via QDL or PCAT",
+    "Multi-SoC support: QCS6490, QCS5430, IQ-9075, IQ-8275, IQ-615",
+    "Troubleshooting guidance for Docker, sync, build, and flash issues",
+    "How-to guides for developer workflows, SDK generation, and network setup"
+  ],
+  "publicApiSurface": [
+    "qsc-cli login",
+    "qsc-cli chip-software download",
+    "qsc-cli chip-software compile",
+    "qsc-cli chip-software flash",
+    "qsc-cli chip-software list-workspace",
+    "qsc-cli chip-software delete-workspace",
+    "qsc-cli chip-software open-build-env",
+    "qsc-cli tool install",
+    "qsc-cli tool activate-license",
+    "qsc-cli tool extract",
+    "qsc-cli show-access-token",
+    "kas build",
+    "kas checkout",
+    "kas shell",
+    "qdl --storage ufs prog_firehose_ddr.elf rawprogram*.xml patch*.xml",
+    "PCAT -PLUGIN SD -DEVICE"
+  ]
+}

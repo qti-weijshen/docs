@@ -1,0 +1,68 @@
+---
+title: "Build overview: Choose your Qualcomm Linux build path"
+description: "Compare Qualcomm Linux build paths: prebuilt images, public source builds, registered-user firmware builds, and the automated QSC CLI workflow."
+---
+
+Qualcomm Linux uses Yocto to build an embedded system software image. Before you begin, Qualcomm recommends reading the [Qualcomm Linux Yocto Guide](https://docs.qualcomm.com/bundle/publicresource/topics/80-80021-27) to understand the Yocto build system. You have two high-level options: download prebuilt images and flash them directly, or sync the source layers, build, and then flash.
+
+## Download prebuilt images and flash
+
+If you want to get a device running quickly without building from source, download the prebuilt flashable images from the Qualcomm documentation portal.
+
+<Steps>
+  <Step title="Get the prebuilt images">
+    In the [Release Notes](https://docs.qualcomm.com/doc/80-80021-300/topic/prebuilt_flashable_images_along_with_esdk.html), go to the **Artifactory links to prebuilt flashable images and eSDK** table and download the images for your device.
+
+    <Note>
+      The Platform eSDK is an installer that lets you synchronize, modify, compile, and install applications and open-source plug-ins within a complete Yocto environment.
+    </Note>
+  </Step>
+  <Step title="Flash the images">
+    Follow [Flash software images](/flash-software-images) to put your device into EDL mode and write the downloaded images using QDL or PCAT.
+  </Step>
+</Steps>
+
+## Sync, build, and flash
+
+If you want to build from source — to modify the BSP, add layers, or compile firmware — choose one of the following paths based on your Qualcomm registration status.
+
+### Unregistered users
+
+If you do not have a registered Qualcomm account, you can still sync and build Qualcomm Linux using the public GitHub sources. Firmware components are provided as prebuilt binaries.
+
+<Card title="Build from source" icon="code" href="/build-from-source">
+  Set up your Ubuntu host, sync Qualcomm Yocto layers from GitHub, and compile a BSP image using prebuilt firmware binaries.
+</Card>
+
+### Registered users
+
+Registered Qualcomm users can access the Qualcomm Yocto layers, supporting base Yocto layers, select firmware component sources, and Qualcomm tools. This lets you build and customize the software beyond what is possible with prebuilt binaries.
+
+<Note>
+  You must [register with Qualcomm](https://www.qualcomm.com/support/working-with-qualcomm) to access the registered-user build paths.
+</Note>
+
+Once registered, you can choose between a manual build or the QSC CLI:
+
+<CardGroup cols={2}>
+  <Card title="Build from source (with firmware and devtool)" icon="microchip" href="/build-from-source-with-firmware-and-devtool">
+    **Manual build.** Access selective proprietary sources and binaries/libraries. Set up your host environment, sync layers, and compile — with control over each step of the process.
+  </Card>
+  <Card title="Build with QSC CLI" icon="terminal" href="/build-with-qsc-cli">
+    **Automated CLI.** Use the QSC command-line interface to download, compile, and flash Qualcomm Linux through a single streamlined workflow.
+  </Card>
+</CardGroup>
+
+## Comparison of build paths
+
+| | Prebuilt images | Build from source | Build from source (with firmware and devtool) | Build with QSC CLI |
+|---|---|---|---|---|
+| **Registration required** | No | No | Yes | Yes |
+| **Builds from source** | No | Yes | Yes | Yes |
+| **Firmware source access** | No | No | Selective | Selective |
+| **Automated workflow** | — | No | No | Yes |
+| **Best for** | Quick evaluation | Public-layer customization | Deep firmware customization | Streamlined registered builds |
+
+<Note>
+  See [Hardware SoCs](https://docs.qualcomm.com/bundle/publicresource/topics/80-80021-115/soc.html) for the complete list of Qualcomm Linux supported SoCs.
+</Note>

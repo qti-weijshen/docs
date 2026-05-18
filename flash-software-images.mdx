@@ -1,0 +1,530 @@
+---
+title: "Flash Qualcomm Linux Software Images to Your Device"
+description: "Obtain flashable binaries from a build or CLO download, put your device into EDL mode, and flash using QDL (Linux/macOS) or PCAT (Linux/macOS/Windows)."
+---
+
+This page walks you through flashing Qualcomm Linux software images onto a supported development kit. You will locate the flashable binaries produced by your build (or download prebuilt ones from CLO artifactory), put the device into emergency download (EDL) mode, and write the images using either QDL or PCAT.
+
+## Obtain flashable binaries
+
+After a successful build, flashable images are written to your workspace at one of the following paths:
+
+- **Flattened image** — ready to flash directly:
+  ```text
+  <Base_Workspace_Path>/build/tmp/deploy/images/<MACHINE>/<IMAGE>-<MACHINE>.rootfs.qcomflash
+  ```
+- **Compressed image directory** — use this if you are downloading prebuilt flashable images from CLO artifactory:
+  ```text
+  <Base_Workspace_Path>/build/tmp/deploy/images/<MACHINE>/<IMAGE>-<MACHINE>.rootfs.qcomflash.tar.gz
+  ```
+
+<Note>
+  To unpack the compressed image directory, run:
+
+  ```bash
+  cd <Base_Workspace_Path>/build/tmp/deploy/images/<MACHINE>/
+  tar -xvf <IMAGE>-<MACHINE>.rootfs.qcomflash.tar.gz
+  ```
+</Note>
+
+## Flash instructions
+
+<Note>
+  If you downloaded prebuilt flashable images (`.tar.gz`) from CLO artifactory, start by forcing the device into EDL mode in the [Force device into EDL mode](#force-device-into-edl-mode) section below.
+</Note>
+
+Follow these steps to flash the software images:
+
+<Steps>
+  <Step title="Update udev rules (one-time)">
+    Configure the `udev` USB rules for the Qualcomm manufacturing vendor ID on your Linux host. This is a one-time prerequisite.
+  </Step>
+  <Step title="Force the device into EDL mode">
+    Put the device into emergency download (EDL) mode using UART, ADB, or a manual hardware method.
+  </Step>
+  <Step title="Install QDL">
+    Download and install the Qualcomm Device Loader tool on your host computer.
+  </Step>
+  <Step title="Provision UFS (one-time)">
+    Divide UFS storage into logical unit numbers (LUNs). This is a one-time prerequisite unless your LUN configuration changes.
+  </Step>
+  <Step title="Flash SAIL (one-time, IQ-9075 and IQ-8275 only)">
+    Flash the Safety Island firmware. Required only for IQ-9075 and IQ-8275 development kits.
+  </Step>
+  <Step title="Choose CDT based on reference kit">
+    Copy the correct configuration data table (CDT) binary for your specific reference kit.
+  </Step>
+  <Step title="Flash the software">
+    Write the images to the device using one of the following tools:
+    - **QDL** — supported on Linux and macOS
+    - **PCAT** — supported on Linux, macOS, and Windows (registered users only)
+  </Step>
+</Steps>
+
+## Update udev rules (one-time)
+
+Configure the `udev` USB rules for the Qualcomm manufacturing vendor ID **05c6** on your Linux host.
+
+1. Go to the `udev` USB rules directory:
+   ```bash
+   cd /etc/udev/rules.d
+   ```
+2. List the contents of the directory:
+   ```bash
+   ls
+   ```
+   - If the `51-qcom-usb.rules` file is not present, create it and add the required rule:
+     ```bash
+     sudo vi 51-qcom-usb.rules
+     ```
+     Add the following line to the file:
+     ```text
+     SUBSYSTEMS=="usb", ATTRS{idVendor}=="05c6", ATTRS{idProduct}=="9008", MODE="0666", GROUP="plugdev"
+     ```
+   - If the file already exists, verify it contains the line above:
+     ```bash
+     cat 51-qcom-usb.rules
+     ```
+3. Restart `udev`:
+   ```bash
+   sudo systemctl restart udev
+   ```
+4. If the USB cable is already connected to the host, unplug and reconnect the cable for the updated rules to take effect.
+
+## Force device into EDL mode
+
+The device must be in EDL mode before you flash. By default, a Qualcomm device enters EDL mode automatically if it powers up with no image or a corrupted image. To force EDL mode manually, choose one of the following methods.
+
+<Tabs>
+  <Tab title="UART">
+    Use UART only if the device already has a preloaded build. This procedure applies to an Ubuntu host environment.
+
+    1. Connect the device to a UART shell.
+    2. In the UART shell, reboot the device into EDL mode:
+       ```bash
+       reboot edl
+       ```
+    3. Verify that the device is in EDL mode:
+       ```bash
+       lsusb
+       ```
+       The output confirms EDL mode when it shows `QDL mode`:
+       ```text
+       Bus 002 Device 014: ID 05c6:9008 Qualcomm, Inc. Gobi Wireless Modem (QDL mode)
+       ```
+  </Tab>
+  <Tab title="ADB">
+    Use ADB only if the device already has a preloaded build. This procedure applies to an Ubuntu host environment.
+
+    1. Install QUD on the host device.
+    2. Install ADB on the host device.
+    3. Connect ADB to the device.
+    4. Reboot the device into EDL mode from a terminal on the host:
+       ```bash
+       adb shell reboot edl
+       ```
+    5. Verify that the device is in EDL mode:
+       ```bash
+       lsusb
+       ```
+       The output confirms EDL mode when it shows `QDL mode`:
+       ```text
+       Bus 002 Device 014: ID 05c6:9008 Qualcomm, Inc. Gobi Wireless Modem (QDL mode)
+       ```
+  </Tab>
+  <Tab title="Manual">
+    Use a hardware switch or button to force EDL mode. Select your development kit below.
+
+    <Tabs>
+      <Tab title="QCS6490 / QCS5430">
+        1. Press and hold the **F\_DL** button.
+
+           <Note>
+             Refer to your development kit hardware guide for the physical **F\_DL** button location.
+           </Note>
+
+        2. Connect the device to a **+12 V wall power supply**.
+        3. Connect the device to the host system using a USB Type-C cable.
+        4. Release the **F\_DL** button. The device is now in EDL mode.
+        5. Verify that the device is in EDL mode:
+           ```bash
+           lsusb
+           ```
+           The output confirms EDL mode when it shows `QDL mode`:
+           ```text
+           Bus 002 Device 014: ID 05c6:9008 Qualcomm, Inc. Gobi Wireless Modem (QDL mode)
+           ```
+      </Tab>
+      <Tab title="IQ-9075">
+        <Tabs>
+          <Tab title="IQ-9 Beta EVK">
+            1. Put the device in EDL mode by turning on dip switch **S5-4**.
+
+               <Note>
+                 Refer to your IQ-9 Beta EVK hardware guide for the physical dip switch location.
+               </Note>
+
+            2. Verify that the device is in EDL mode:
+               ```bash
+               lsusb
+               ```
+               **Sample output**
+               ```text
+               Bus 002 Device 014: ID 05c6:9008 Qualcomm, Inc. Gobi Wireless Modem (QDL mode)
+               ```
+
+            <Warning>
+              Turn off dip switch S5-4 after flashing is complete.
+            </Warning>
+          </Tab>
+          <Tab title="IQ-9075 EVK">
+            1. Put the device in EDL mode by turning on dip switch **SW2-3**.
+
+               <Note>
+                 Refer to your IQ-9075 EVK hardware guide for the physical dip switch location.
+               </Note>
+
+            2. Verify that the device is in EDL mode:
+               ```bash
+               lsusb
+               ```
+               The output confirms EDL mode when it shows `QDL mode`:
+               ```text
+               Bus 002 Device 014: ID 05c6:9008 Qualcomm, Inc. Gobi Wireless Modem (QDL mode)
+               ```
+
+            <Warning>
+              Turn off dip switch S2-8 after flashing is complete.
+            </Warning>
+          </Tab>
+        </Tabs>
+      </Tab>
+      <Tab title="IQ-8275">
+        <Tabs>
+          <Tab title="IQ-8 Beta EVK">
+            1. Put the device in EDL mode by turning on dip switch **S5-4**.
+
+               <Note>
+                 Refer to your IQ-8 Beta EVK hardware guide for the physical dip switch location.
+               </Note>
+
+            2. Verify that the device is in EDL mode:
+               ```bash
+               lsusb
+               ```
+               The output confirms EDL mode when it shows `QDL mode`:
+               ```text
+               Bus 002 Device 014: ID 05c6:9008 Qualcomm, Inc. Gobi Wireless Modem (QDL mode)
+               ```
+
+            <Warning>
+              Turn off dip switch S5-4 after flashing is complete.
+            </Warning>
+          </Tab>
+          <Tab title="IQ-8275 EVK">
+            1. Put the device in EDL mode by turning on dip switch **S2-8**.
+
+               <Note>
+                 Refer to your IQ-8275 EVK hardware guide for the physical dip switch location.
+               </Note>
+
+            2. Verify that the device is in EDL mode:
+               ```bash
+               lsusb
+               ```
+               **Sample output**
+               ```text
+               Bus 002 Device 014: ID 05c6:9008 Qualcomm, Inc. Gobi Wireless Modem (QDL mode)
+               ```
+
+            <Warning>
+              Turn off dip switch S2-8 after flashing is complete.
+            </Warning>
+          </Tab>
+        </Tabs>
+      </Tab>
+      <Tab title="IQ-615">
+        1. Put the device in EDL mode by turning off the SW switch and turning on dip switch **SW3-4**.
+
+           <Note>
+             Refer to your IQ-615 hardware guide for the physical switch locations.
+           </Note>
+
+        2. Verify that the device is in EDL mode:
+           ```bash
+           lsusb
+           ```
+           The output confirms EDL mode when it shows `QDL mode`:
+           ```text
+           Bus 002 Device 014: ID 05c6:9008 Qualcomm, Inc. Gobi Wireless Modem (QDL mode)
+           ```
+
+        <Warning>
+          After flashing is complete, turn on the SW switch and turn off dip switch SW3-4.
+        </Warning>
+      </Tab>
+    </Tabs>
+  </Tab>
+</Tabs>
+
+## Install QDL
+
+Qualcomm Device Loader (QDL) is the tool that communicates with Qualcomm USB devices to upload a flash loader and write software images.
+
+1. Download the latest QDL tool. You can download it from the [Qualcomm Software Center](https://softwarecenter.qualcomm.com/#/catalog/item/Qualcomm_Device_Loader) or use the CLI commands below:
+
+   <Tabs>
+     <Tab title="Linux">
+       ```bash
+       # X64
+       wget https://softwarecenter.qualcomm.com/api/download/software/tools/Qualcomm_Device_Loader/Linux/Debian/latest.zip
+
+       # ARM64
+       wget https://softwarecenter.qualcomm.com/api/download/software/tools/Qualcomm_Device_Loader/Linux/ARM64/Debian/latest.zip
+       ```
+     </Tab>
+     <Tab title="macOS">
+       ```bash
+       # X64
+       wget https://softwarecenter.qualcomm.com/api/download/software/tools/Qualcomm_Device_Loader/macOS/latest.zip
+
+       # ARM64
+       wget https://softwarecenter.qualcomm.com/api/download/software/tools/Qualcomm_Device_Loader/macOS/ARM64/latest.zip
+       ```
+     </Tab>
+   </Tabs>
+
+2. Unzip the downloaded archive:
+   ```bash
+   unzip <qdl_downloaded_file>.zip
+   ```
+3. Grant executable permission to QDL:
+   ```bash
+   chmod -R 777 <qdl_download_path>
+   ```
+
+## Provision UFS
+
+Universal flash storage (UFS) provisioning divides storage into logical unit numbers (LUNs), which store different types of data separately to improve access efficiency and system organization.
+
+UFS is provisioned by default. Re-provision only if your LUN configuration changes. To download the provision XML file and check applicability for each SoC, see the _UFS Provision_ table in the [Release Notes](https://docs.qualcomm.com/doc/80-80021-300/topic/release_specific_information.html).
+
+1. Download the provision file for your SoC:
+   ```bash
+   mkdir <provision_download_path>
+   cd <provision_download_path>
+   wget <provision_download_link>
+   # Example: wget https://artifacts.codelinaro.org/artifactory/codelinaro-le/Qualcomm_Linux/QCS6490/provision.zip
+   unzip <downloaded_zip_file>
+   # Example: unzip provision.zip
+   ```
+2. Provision UFS:
+   ```bash
+   cd <provision_download_path>
+   <qdl_download_path>/QDL_<version>_<operating_system>_<architecture_type>/qdl --storage ufs prog_firehose_ddr.elf <Provision file>
+   # Example: <qdl_download_path>/QDL_2.3.9_Linux_x64/qdl --storage ufs prog_firehose_ddr.elf provision_1_3.xml
+   ```
+
+## Flash SAIL
+
+<Note>
+  Safety Island (SAIL) applies only to the Qualcomm Dragonwing IQ-9075 and IQ-8275 development kits. If you are using a different kit, skip to [Choose CDT](#choose-cdt-based-on-reference-kit).
+</Note>
+
+Flash the SAIL firmware:
+
+```bash
+# SAIL image location:
+# <workspace_path>/build/tmp/deploy/images/<MACHINE>/<IMAGE>-<MACHINE>/sail_nor
+cd <workspace_path>/build/tmp/deploy/images/<MACHINE>/<IMAGE>-<MACHINE>/sail_nor
+<qdl_download_path>/QDL_<version>_<operating_system>_<architecture_type>/qdl --storage spinor prog_firehose_ddr.elf rawprogram0.xml patch0.xml
+# Example: <qdl_download_path>/QDL_2.3.9_Linux_x64/qdl --storage spinor prog_firehose_ddr.elf rawprogram0.xml patch0.xml
+```
+
+## Choose CDT based on reference kit
+
+The configuration data table (CDT) provides platform-dependent data such as platform ID, subtype, and version. Drivers and firmware modules use this data to detect and initialize the platform correctly.
+
+<Note>
+  - Skip this step if your reference kit is a Core Kit — the default `cdt.bin` is already correct.
+  - For all other kits, rename the appropriate CDT file to `cdt.bin` in the flashable images path.
+</Note>
+
+Copy the correct CDT binary for your reference kit:
+
+```bash
+# Navigate to the flashable images path:
+cd <workspace_path>/build/tmp/deploy/images/<MACHINE>/<IMAGE>-<MACHINE>/
+
+# Available CDT files (example for Kodiak): cdt_core_kit.bin, cdt_vision_kit.bin, cdt_industrial_kit.bin
+# Set the correct CDT as cdt.bin — for example, for the RB3Gen2 Vision Kit:
+cp cdt_vision_kit.bin cdt.bin
+```
+
+<Note>
+  After flashing, verify the correct CDT loaded by checking the UEFI serial logs:
+
+  ```text
+  Platform Init [ 1966] BDS
+  Platform : IOT
+  Subtype : 2
+  Boot Device : UFS
+  Chip Name : QCS6490
+  Chip Ver : 1.0
+  ```
+
+  Use the `Subtype` field to identify the loaded CDT:
+
+  | Subtype | Kit |
+  |---------|-----|
+  | 2 | Vision Kit (Moselle attach) |
+  | 5 | RB3Gen2 Core Kit (hsp attach) |
+  | 6 | RB3Gen2 Core Kit (Moselle attach) |
+  | 7 | Vision Kit (hsp attach) |
+  | 13 | Industrial Mezz Kit |
+</Note>
+
+## Flash software using QDL
+
+QDL is supported on Linux and macOS.
+
+1. Stop the ModemManager service if it is running. Some Linux distributions include ModemManager to manage mobile broadband connections. When you connect the device over USB, it is identified as a Qualcomm modem, and ModemManager will try to configure it — interfering with QDL flashing. Stop it before connecting the device:
+   ```bash
+   sudo systemctl stop ModemManager
+   ```
+   You can restart ModemManager after flashing if needed.
+
+2. Flash the images:
+   ```bash
+   # Built images are under <workspace_path>/build/tmp/deploy/images/<MACHINE>/<IMAGE>-<MACHINE>/
+   # For UFS storage:
+   <qdl_download_path>/QDL_<version>_<operating_system>_<architecture_type>/qdl --storage ufs prog_firehose_ddr.elf rawprogram*.xml patch*.xml
+   # For EMMC storage:
+   <qdl_download_path>/QDL_<version>_<operating_system>_<architecture_type>/qdl --storage emmc prog_firehose_ddr.elf rawprogram0.xml patch0.xml
+   ```
+
+   <Note>
+     - Each machine configuration defaults to either UFS or EMMC storage. To check the default for your target, see [Set storage](https://docs.qualcomm.com/doc/80-80021-254/topic/how_to.html?product=895724676033554725&facet=Build%20Guide&version=2.0-rc2#set-storage).
+     - Use the QDL binary that matches your host architecture. For example, use `QDL_Linux_x64/qdl` on an x64 Linux host.
+   </Note>
+
+   Flashing succeeds when the terminal shows `partition 1 is now bootable`:
+   ```text
+   LOG: INFO: Calling handler for setbootablestoragedrive
+   LOG: INFO: Using scheme of value = 1
+   partition 1 is now bootable
+   LOG: INFO: Calling handler for power
+   LOG: INFO: Will issue reset/power off 100 useconds, if this hangs check if watchdog is enabled
+   LOG: INFO: bsp_target_reset() 1
+   ```
+
+3. After flashing, run `lsusb` to confirm the device is recognized:
+   ```bash
+   # Sample output for QCS6490
+   Bus 002 Device 003: ID 05c6:9135 Qualcomm, Inc. qcs6490-rb3gen2-vision-kit
+   Bus 002 Device 001: ID 1d6b:0003 Linux Foundation 3.0 root hub
+   Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+   ```
+   To verify the software version on the device, see [Verify the Qualcomm Linux version](https://docs.qualcomm.com/bundle/publicresource/topics/80-80021-251/set_up_the_device.html#verify-the-qualcomm-linux-version).
+
+<Note>
+  The correct camera driver and video driver may not be enabled by default for certain kits. To enable them, see [Configure alternative drivers](https://docs.qualcomm.com/doc/80-80021-254/topic/enable_dtb_overlay.html?product=895724676033554725&facet=Build%20Guide&version=2.0-rc2#enable-dtb-overlay).
+</Note>
+
+<Note>
+  If flashing fails, perform the following steps and retry:
+
+  1. Power off the device.
+  2. Disconnect it from the host.
+  3. Restart the host.
+</Note>
+
+## Flash software using PCAT
+
+<Note>
+  PCAT flashing is available for registered Qualcomm users only. PCAT is supported on Linux, macOS, and Windows.
+</Note>
+
+1. [Install QSC CLI](https://docs.qualcomm.com/doc/80-80021-254/topic/build_frm_source_qsc_cli.html?product=895724676033554725&facet=Build%20Guide&version=2.0-rc2#install-qsc-cli).
+
+2. Install the Qualcomm PCAT and QUD tools on your host computer:
+   ```bash
+   qsc-cli login
+   qsc-cli tool install --name quts --activate-default-license
+   qsc-cli tool install --name qud --activate-default-license
+   qsc-cli tool install --name pcat --activate-default-license
+   ```
+
+   <Note>
+     On Ubuntu 22.04, you may encounter an issue installing QUD that requires enrolling a public key on your Linux host. Follow the steps in the README at `/opt/QTI/sign/signReadme.txt`.
+   </Note>
+
+3. Check that the `QTI_HS-USB_QDLoader` driver is available:
+   ```bash
+   ls -la /dev/Q*
+   ```
+   **Sample output**
+   ```text
+   crw-rw-rw- 1 root 242 0 Dec 10 10:51 /dev/QTI_HS-USB_QDLoader_9008_3-8:1.0
+   ```
+
+4. Verify that the device is in EDL mode:
+   ```bash
+   lsusb
+   ```
+   The output confirms EDL mode when it shows `QDL mode`:
+   ```text
+   Bus 002 Device 014: ID 05c6:9008 Qualcomm, Inc. Gobi Wireless Modem (QDL mode)
+   ```
+
+5. Check that PCAT recognizes the device:
+   ```bash
+   pcat -devices
+   ```
+   **Sample output**
+   ```text
+   Searching devices in Device Manager, please wait for a moment…
+   ID | DEVICE TYPE | DEVICE STATE | SERIAL NUMBER | ADB SERIAL NUMBER | DESCRIPTION
+   NA | NA          | EDL          | BE116704      | be116704          | Qualcomm USB Composite Device:QUSB_BULK_CID:042F_SN:BE116704
+   ```
+
+6. Flash the build:
+   ```bash
+   # <build_images_path> is <workspace_path>/build/tmp/deploy/images/<MACHINE>/<IMAGE>-<MACHINE>/
+   cd <build_images_path>
+
+   # For UFS storage:
+   cp ./partition_ufs/gpt_main*.bin ./partition_ufs/gpt_backup*.bin ./partition_ufs/rawprogram[0-9].xml ./partition_ufs/patch*.xml ./partition_ufs/zeros_*sectors.bin ./
+   PCAT -PLUGIN SD -DEVICE <device_serial_number> -BUILD "<build_images_path>" -MEMORYTYPE UFS -FLAVOR asic
+   # Example: PCAT -PLUGIN SD -DEVICE be116704 -BUILD "<workspace_path>/build/tmp/deploy/images/<MACHINE>/<IMAGE>-<MACHINE>/" -MEMORYTYPE UFS -FLAVOR asic
+
+   # For EMMC storage:
+   cp ./partition_emmc/gpt_main*.bin ./partition_emmc/gpt_backup*.bin ./partition_emmc/rawprogram[0-9].xml ./partition_emmc/patch*.xml ./partition_emmc/zeros_*sectors.bin ./
+   PCAT -PLUGIN SD -DEVICE <device_serial_number> -BUILD "<build_images_path>" -MEMORYTYPE EMMC -FLAVOR asic -RAWPROG "<build_images_path>/rawprogram0.xml" -PATCHPROG "<build_images_path>/patch0.xml"
+   ```
+
+   A successful flash produces output similar to:
+   ```text
+   xxxx INFO] [ FIRMWARE DOWNLOAD LOG ] Process Finished
+   xxxx INFO] Status - TRUE
+   xxxx INFO] Response - Downloading software images completed on the device Qualcomm USB Composite Device:QUSB_BULK_CID:042F_SN:BE116704
+   ```
+
+7. After flashing, run `lsusb` to confirm the device is recognized:
+   ```bash
+   # Sample output for QCS6490
+   Bus 002 Device 003: ID 05c6:9135 Qualcomm, Inc. qcs6490-rb3gen2-vision-kit
+   Bus 002 Device 001: ID 1d6b:0003 Linux Foundation 3.0 root hub
+   Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+   ```
+   The device reboots after a successful flash. To verify the software version, see [Verify the Qualcomm Linux version](https://docs.qualcomm.com/bundle/publicresource/topics/80-80021-251/set_up_the_device.html#verify-the-qualcomm-linux-version).
+
+<Note>
+  The correct camera driver and video driver may not be enabled by default for certain kits. To enable them, see [Configure alternative drivers](https://docs.qualcomm.com/doc/80-80021-254/topic/enable_dtb_overlay.html?product=895724676033554725&facet=Build%20Guide&version=2.0-rc2#enable-dtb-overlay).
+</Note>
+
+## Related topics
+
+- [Connect to UART shell](https://docs.qualcomm.com/doc/80-80021-254/topic/how_to.html?product=895724676033554725&facet=Build%20Guide&version=2.0-rc2#connect-uart)
+- [Connect to network](https://docs.qualcomm.com/doc/80-80021-254/topic/how_to.html?product=895724676033554725&facet=Build%20Guide&version=2.0-rc2#connect-to-network)
+- [Sign in using SSH](https://docs.qualcomm.com/doc/80-80021-254/topic/how_to.html?product=895724676033554725&facet=Build%20Guide&version=2.0-rc2#use-ssh)

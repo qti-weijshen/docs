@@ -1,0 +1,30 @@
+---
+title: "Qualcomm Linux Build Guide: Full Documentation Map"
+description: "Browse all Qualcomm Linux build documentation — from host setup and source builds to firmware compilation, image flashing, and troubleshooting."
+---
+
+This guide covers every step of getting Qualcomm Linux running on your development kit — from setting up your host environment to flashing a finished software image. Whether you want to download prebuilt images, compile from public GitHub sources, or build firmware from source as a registered Qualcomm partner, the sections below show you where to start.
+
+<CardGroup cols={2}>
+  <Card title="Build overview" icon="map" href="/build-overview">
+    Understand your options: prebuilt images, source builds for unregistered users, and advanced builds for registered users. Choose the path that matches your access level.
+  </Card>
+  <Card title="Build from source" icon="code" href="/build-from-source">
+    Set up your Ubuntu host, sync Qualcomm Yocto layers, and compile a BSP image. Firmware components are available as prebuilt binaries — no registration required.
+  </Card>
+  <Card title="Build from source (with firmware and devtool)" icon="microchip" href="/build-from-source-with-firmware-and-devtool">
+    For registered Qualcomm users. Sync, build, and access select firmware components as source alongside the standard Yocto layers.
+  </Card>
+  <Card title="Build with QSC CLI" icon="terminal" href="/build-with-qsc-cli">
+    Use the Qualcomm Software Center CLI to download, compile, and flash Qualcomm Linux through a single automated command-line workflow.
+  </Card>
+  <Card title="Flash software images" icon="bolt" href="/flash-software-images">
+    Flash your built or prebuilt images to a connected device using QDL or PCAT. Step-by-step instructions for each supported development kit.
+  </Card>
+  <Card title="Troubleshoot" icon="wrench" href="/troubleshoot">
+    Resolve common issues with Docker setup, layer sync, compilation errors, and device flashing.
+  </Card>
+  <Card title="How-to guides" icon="book-open" href="/how-to">
+    Answers to common questions on syncing, building, setting up networks, and configuring your overall developer workflow.
+  </Card>
+</CardGroup>

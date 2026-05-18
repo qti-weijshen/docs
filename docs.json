@@ -1,0 +1,58 @@
+{
+  "$schema": "https://mintlify.com/schema.json",
+  "name": "Qualcomm Linux Build Guide",
+  "theme": "aspen",
+  "logo": {
+    "light": "https://media.brand.dev/e3333fc2-5097-4396-bc51-a5691be2cbb1.svg",
+    "dark": "https://media.brand.dev/e3333fc2-5097-4396-bc51-a5691be2cbb1.svg"
+  },
+  "favicon": "https://media.brand.dev/f1011599-095a-4962-9ce6-952b113b8185.png",
+  "colors": {
+    "primary": "#04347c",
+    "light": "#4393ca",
+    "dark": "#2b5773"
+  },
+  "font": {
+    "headings": { "family": "Archivo" },
+    "body": { "family": "Archivo" }
+  },
+  "navbar": {
+    "primary": {
+      "type": "github",
+      "href": "https://github.com/qualcomm-linux/meta-qcom"
+    }
+  },
+  "navigation": {
+    "groups": [
+      {
+        "group": "Overview",
+        "pages": [
+          "index",
+          "build-guide",
+          "build-overview"
+        ]
+      },
+      {
+        "group": "Build",
+        "pages": [
+          "build-from-source",
+          "build-from-source-with-firmware-and-devtool",
+          "build-with-qsc-cli"
+        ]
+      },
+      {
+        "group": "Flash",
+        "pages": [
+          "flash-software-images"
+        ]
+      },
+      {
+        "group": "Reference",
+        "pages": [
+          "how-to",
+          "troubleshoot"
+        ]
+      }
+    ]
+  }
+}

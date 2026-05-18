@@ -1,0 +1,67 @@
+---
+title: "Qualcomm Linux Build Guide: Overview and Quick Start"
+description: "Configure, download, compile, and flash Qualcomm Linux on supported Qualcomm development kits. Choose prebuilt images, source builds, or the QSC CLI."
+---
+
+Qualcomm Linux Build Guide helps you get Qualcomm Linux running on your development kit — from setting up your host environment through flashing a fully built software image. Whether you are an unregistered developer building from public GitHub sources or a licensed partner compiling firmware from source, this guide covers every step.
+
+<CardGroup cols={2}>
+  <Card title="Build Overview" icon="map" href="/build-overview">
+    Understand your options: prebuilt images, source builds, and QSC CLI — and choose the right path for your access level.
+  </Card>
+
+  <Card title="Build from Source" icon="code" href="/build-from-source">
+    Set up your Ubuntu host, sync Qualcomm Yocto layers, and compile a BSP image using prebuilt firmware binaries.
+  </Card>
+
+  <Card title="Build with QSC CLI" icon="terminal" href="/build-with-qsc-cli">
+    Use the Qualcomm Software Center CLI to download, compile, and flash Qualcomm Linux through a single command-line workflow.
+  </Card>
+
+  <Card title="Flash Software Images" icon="bolt" href="/flash-software-images">
+    Flash your built or prebuilt images to a connected device using QDL or PCAT.
+  </Card>
+
+  <Card title="How-To Guides" icon="book-open" href="/how-to">
+    Recipes for common tasks: managing workspaces, generating SDKs, setting up networks, and more.
+  </Card>
+
+  <Card title="Troubleshoot" icon="wrench" href="/troubleshoot">
+    Resolve common Docker, sync, build, and flash errors with step-by-step solutions.
+  </Card>
+</CardGroup>
+
+## Get started
+
+<Steps>
+  <Step title="Check your access level">
+    Determine whether you are an unregistered developer (public GitHub access) or a registered Qualcomm user with access to proprietary firmware sources. Your access level determines which build path to follow.
+  </Step>
+  <Step title="Prepare your host machine">
+    You need an x86 Ubuntu 22.04 machine with at least 300 GB free disk space, 16 GB RAM, and a quad-core CPU. See [Build from Source](/build-from-source#host-computer-requirements) for the full list of tools to install.
+  </Step>
+  <Step title="Choose your build method">
+    - **Unregistered users**: Follow [Build from Source](/build-from-source) using public GitHub layers and prebuilt firmware binaries.
+    - **Registered users (manual)**: Follow [Build from Source with Firmware and Devtool](/build-from-source-with-firmware-and-devtool) to compile firmware components from source.
+    - **Registered users (automated)**: Follow [Build with QSC CLI](/build-with-qsc-cli) to let QSC CLI handle download, compilation, and flashing.
+  </Step>
+  <Step title="Flash your device">
+    After a successful build, follow [Flash Software Images](/flash-software-images) to put your device into EDL mode and write the image using QDL or PCAT.
+  </Step>
+</Steps>
+
+## Supported devices
+
+Qualcomm Linux supports the following development kits:
+
+| Development Kit | SoC |
+| --- | --- |
+| RB3 Gen 2 / QCS6490 EVK | QCS6490 / QCS5430 |
+| IQ-9075 EVK | QCS9100 |
+| IQ-8275 EVK | QCS8300 |
+| IQ-615 EVK | QCS615 |
+| IQ-X7181 EVK | Dragonwing IQ-X7181 (Qualcomm Oryon) |
+
+<Note>
+  See [Hardware SoCs](https://docs.qualcomm.com/bundle/publicresource/topics/80-80021-115/soc.html) for the complete list of Qualcomm Linux supported SoCs.
+</Note>
