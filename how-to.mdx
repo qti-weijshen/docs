@@ -3,8 +3,6 @@ title: "Qualcomm Linux Build: How-To Recipes and Workflows"
 description: "Practical recipes for common developer tasks: workspace management, shared caches, SDK generation, UART setup, network configuration, and more."
 ---
 
-testing!!!
-
 This page collects practical recipes for common tasks you will encounter when building, flashing, and developing with Qualcomm Linux. Tasks are organized by category — Sync, Build, Developer Workflow, and Setup — so you can find what you need without reading the guide from start to finish.
 
 ## Sync
@@ -99,7 +97,7 @@ local_conf_header:
   "
 EOF
 
-kas build <kas configuration files>:meta-qcom/ci/downloads-mirror.yml
+kas build <kas configuration files>:meta-qcom/ci/downloads-mirrors.yml
 # Example
 # kas build meta-qcom/ci/iq-9075-evk.yml:meta-qcom/ci/qcom-distro.yml:meta-qcom/ci/linux-qcom-6.18.yml:meta-qcom/ci/lock.yml:meta-qcom/ci/downloads-mirrors.yml
 ```

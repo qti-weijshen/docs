@@ -88,11 +88,12 @@ Install and configure the software tools on the Ubuntu host computer.
    pipx install kas
    ```
 2. (Optional) Download the `kas-container` script. Kas is the tool you use to sync and build Yocto meta layers. The kas package also includes the `kas-container` script, which runs kas inside a container. If you prefer building images in an isolated environment, use `kas-container` instead.
-   ````bash
+   ```bash
    # kas-container can be run on any Linux distribution with Docker installed.
    wget -qO kas-container https://raw.githubusercontent.com/siemens/kas/refs/tags/5.1/kas-container
    chmod +x kas-container
-   ```3. Add your Qualcomm login ID with PAT to the `~/.netrc` file in your home directory:
+   ```
+3. Add your Qualcomm login ID with PAT to the `~/.netrc` file in your home directory:
    ```bash
    # Sign in to qsc-cli to generate PAT
    qsc-cli login -u <username>
@@ -101,7 +102,7 @@ Install and configure the software tools on the Ubuntu host computer.
    # This command gives output as shown in the following note
    # The last line in this output is the token, which can be used to access
    # Qualcomm Proprietary repositories. This token expires in two weeks.
-   ````
+   ```
    <Note>
      ```text
      user@hostname:/local/mnt/workspace$ qsc-cli show-access-token 
@@ -109,7 +110,7 @@ Install and configure the software tools on the Ubuntu host computer.
      5LThNlklb55mMVLB5C2KqUGU2jCF
      ```
    </Note>
-3. Use your preferred text editor to edit the `~/.netrc` file and add the following entries. Create the `~/.netrc` file if it doesn't exist.
+4. Use your preferred text editor to edit the `~/.netrc` file and add the following entries. Create the `~/.netrc` file if it doesn't exist.
    ```text
    machine chipmaster2.qti.qualcomm.com
    login <your Qualcomm login id>
@@ -118,14 +119,14 @@ Install and configure the software tools on the Ubuntu host computer.
    login <your Qualcomm login id>
    password <your PAT token>
    ```
-4. Set up the locales (if not set up already):
+5. Set up the locales (if not set up already):
    ```bash
    sudo locale-gen en_US.UTF-8
    sudo update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
    export LC_ALL=en_US.UTF-8
    export LANG=en_US.UTF-8
    ```
-5. Update git configurations:
+6. Update git configurations:
    ```bash
    # Check if your identity is configured in .gitconfig
    git config --get user.email
@@ -144,7 +145,7 @@ Install and configure the software tools on the Ubuntu host computer.
    git config --global http.https://chipmaster2.qti.qualcomm.com.followRedirects true
    git config --global http.https://qpm-git.qualcomm.com.followRedirects true
    ```
-6. Set up Python 3.10.2:
+7. Set up Python 3.10.2:
    <Note>
      Skip the following instructions if you already have Python 3.10.2 or later.
    </Note>
