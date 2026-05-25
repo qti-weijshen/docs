@@ -71,7 +71,7 @@ This page provides solutions for the most common issues you may encounter during
     ```bash
     sudo apt update
     sudo apt install apt-transport-https ca-certificates curl gnupg lsb-release
-    curl -fsSL http://mirrors.aliyun.com/docker-ce/linux/ubuntu/gpg | sudo apt-key add –
+    curl -fsSL http://mirrors.aliyun.com/docker-ce/linux/ubuntu/gpg | sudo apt-key add -
     sudo add-apt-repository "deb [arch=amd64] http://mirrors.aliyun.com/docker-ce/linux/ubuntu $(lsb_release -cs) stable"
     ```
   </Accordion>
@@ -457,7 +457,7 @@ This page provides solutions for the most common issues you may encounter during
 
     To enable verbose logging for a single recipe — for example, the `diag` recipe:
 
-    1. Edit `layers/meta-qcom-hwe/recipes-bsp/diag/daig_15.0.bb` and add:
+    1. Edit `layers/meta-qcom-hwe/recipes-bsp/diag/diag_15.0.bb` and add:
 
        ```text
        BB_GIT_VERBOSE_FETCH = "1"
